@@ -9,9 +9,7 @@ on:
 
 env:
   COMMANDLINE_TOOLS_VERSION: "6.1.0.830"
-  COMMANDLINE_TOOLS_PART_AA: "https://0ab2cd634e9cc88931d5697f43ed56cf.r2.cloudflarestorage.com/fileshare/commandline-tools-linux-x64-6.1.0.830.zip.part_aa?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=3a04dbbda38fea225676c996f7c649f5%2F20260510%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260510T150321Z&X-Amz-Expires=315360000&X-Amz-SignedHeaders=host&X-Amz-Signature=7b57b41e52ca8ef9eda17817fd4670b4267ef61ac0efb85145087fb2a3ec6e1d"
-  COMMANDLINE_TOOLS_PART_AB: "https://0ab2cd634e9cc88931d5697f43ed56cf.r2.cloudflarestorage.com/fileshare/commandline-tools-linux-x64-6.1.0.830.zip.part_ab?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=3a04dbbda38fea225676c996f7c649f5%2F20260510%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260510T150321Z&X-Amz-Expires=315360000&X-Amz-SignedHeaders=host&X-Amz-Signature=ec66a7cc200d59414463434ae7ac9013649931862286cd9ec85dcca023b249c2"
-  COMMANDLINE_TOOLS_PART_AC: "https://0ab2cd634e9cc88931d5697f43ed56cf.r2.cloudflarestorage.com/fileshare/commandline-tools-linux-x64-6.1.0.830.zip.part_ac?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=3a04dbbda38fea225676c996f7c649f5%2F20260510%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260510T150322Z&X-Amz-Expires=315360000&X-Amz-SignedHeaders=host&X-Amz-Signature=8e1c4b6bd4df4d51a9ec34f89f3b4ff051932ad2a530d5416127487f2b202d31"
+  CLI_TOOLS_RELEASE: "https://github.com/cnChenKai/arkvault/releases/download/cli-tools-v6.1.0.830"
 
 jobs:
   build:
@@ -41,21 +39,18 @@ jobs:
 
       - name: Download Command Line Tools
         if: steps.cache-cli.outputs.cache-hit != 'true'
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
-          pip install awscli
           cd /tmp
-          aws s3 cp s3://fileshare/commandline-tools-linux-x64-6.1.0.830.zip commandline-tools.zip \
-            --endpoint-url https://0ab2cd634e9cc88931d5697f43ed56cf.r2.cloudflarestorage.com
-          ls -lh commandline-tools.zip
+          wget -nv "${{ env.CLI_TOOLS_RELEASE }}/commandline-tools.zip.part_aa"
+          wget -nv "${{ env.CLI_TOOLS_RELEASE }}/commandline-tools.zip.part_ab"
+          wget -nv "${{ env.CLI_TOOLS_RELEASE }}/commandline-tools.zip.part_ac"
+          cat commandline-tools.zip.part_* > commandline-tools.zip
+          rm commandline-tools.zip.part_*
           sudo mkdir -p /opt/command-line-tools
-          sudo unzip -q commandline-tools.zip -d cli-extract
-          ls -la cli-extract/command-line-tools/ | head -10
-          sudo cp -r cli-extract/command-line-tools/. /opt/command-line-tools/
+          sudo unzip -q commandline-tools.zip -d /tmp/cli-extract
+          sudo cp -r /tmp/cli-extract/command-line-tools/. /opt/command-line-tools/
           sudo chmod -R 755 /opt/command-line-tools
-          rm -rf cli-extract commandline-tools.zip
+          rm -rf /tmp/cli-extract /tmp/commandline-tools.zip
 
       - name: Setup Environment
         run: |
@@ -87,7 +82,6 @@ jobs:
 
       - name: Configure Signing
         run: |
-          # 用 CI 模板替换密码占位符
           sed 's/__P12_PASSWORD__/${{ secrets.P12_PASSWORD }}/g' build-profile.ci.json5 > build-profile.json5
 
       - name: Install Dependencies
