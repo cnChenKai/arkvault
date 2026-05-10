@@ -1,1 +1,10 @@
-export { appTasks } from '@ohos/hvigor-ohos-plugin';
+{
+  "modelVersion": "5.0.0",
+  "dependencies": {
+    "@ohos/hvigor-ohos-plugin": "5.0.0"
+  },
+  "execution": {
+    "daemon": false,
+    "incremental": true
+  }
+}
