@@ -93,10 +93,11 @@ export async function encryptAesGcm(
   const cipher: cryptoFramework.Cipher =
     cryptoFramework.createCipher('AES256|GCM|PKCS7');
 
-  const gcmParams: cryptoFramework.GcmParams = {
+  const gcmParams: cryptoFramework.GcmParamsSpec = {
     iv: { data: nonce },
     aad: { data: new Uint8Array(0) },
-    authTag: { data: new Uint8Array(GCM_TAG_LENGTH / 8) }
+    authTag: { data: new Uint8Array(GCM_TAG_LENGTH / 8) },
+    algName: 'GcmParamsSpec'
   };
 
   await cipher.init(cryptoFramework.CryptoMode.ENCRYPT_MODE, symKey, gcmParams);
@@ -122,10 +123,11 @@ export async function decryptAesGcm(
   const cipher: cryptoFramework.Cipher =
     cryptoFramework.createCipher('AES256|GCM|PKCS7');
 
-  const gcmParams: cryptoFramework.GcmParams = {
+  const gcmParams: cryptoFramework.GcmParamsSpec = {
     iv: { data: nonce },
     aad: { data: new Uint8Array(0) },
-    authTag: { data: new Uint8Array(GCM_TAG_LENGTH / 8) }
+    authTag: { data: new Uint8Array(GCM_TAG_LENGTH / 8) },
+    algName: 'GcmParamsSpec'
   };
 
   await cipher.init(cryptoFramework.CryptoMode.DECRYPT_MODE, symKey, gcmParams);

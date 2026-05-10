@@ -6,9 +6,6 @@
 // device security state. Never mirror these values into RDB or preferences.
 
 import { asset } from '@kit.AssetStoreKit';
-import { util } from '@kit.ArkTS';
-
-const TAG: string = 'AssetStoreAdapter';
 
 interface AssetStoreOptions {
   alias: string;
@@ -21,22 +18,16 @@ interface AssetStoreOptions {
  * Store a protected value in Asset Store Kit.
  */
 export async function storeAsset(options: AssetStoreOptions): Promise<void> {
-  const attributes: asset.AssetMap = {
-    '@ohos.security.assetStoreKit.tag.data': options.data,
-    '@ohos.security.assetStoreKit.tag.access.control':
-      options.requireScreenUnlock === true
-        ? asset.AccessControl.DEVICE_PASSCODE
-        : asset.AccessControl.DEVICE_CREDENTIAL,
-    '@ohos.security.assetStoreKit.tag.sync.type':
-      options.allowCloudBackup === true
-        ? asset.SyncType.ALLOW_BACKUP
-        : asset.SyncType.DO_NOT_BACK_UP
-  };
+  const attributes: asset.AssetMap = new Map<asset.Tag, asset.DataType>();
+  attributes.set(asset.Tag.SECRET, options.data);
+  attributes.set(asset.Tag.ALIAS, new TextEncoder().encode(options.alias));
+  attributes.set(asset.Tag.REQUIRE_PASSWORD_SET, options.requireScreenUnlock === true);
+  attributes.set(asset.Tag.SYNC_TYPE,
+    options.allowCloudBackup === true
+      ? asset.SyncType.ALLOW_BACKUP
+      : asset.SyncType.DO_NOT_BACK_UP);
 
-  await asset.add({
-    name: options.alias,
-    attributes: attributes
-  });
+  await asset.add(attributes);
 }
 
 /**
@@ -44,11 +35,11 @@ export async function storeAsset(options: AssetStoreOptions): Promise<void> {
  */
 export async function retrieveAsset(alias: string): Promise<Uint8Array | null> {
   try {
-    const result: asset.AssetResult = await asset.query({
-      name: alias,
-      attributes: {}
-    });
-    const data = result.attributes['@ohos.security.assetStoreKit.tag.data'];
+    const query: asset.AssetMap = new Map<asset.Tag, asset.DataType>();
+    query.set(asset.Tag.ALIAS, new TextEncoder().encode(alias));
+
+    const result: asset.AssetMap = await asset.query(query);
+    const data = result.get(asset.Tag.SECRET);
     if (data instanceof Uint8Array) {
       return data;
     }
@@ -63,7 +54,9 @@ export async function retrieveAsset(alias: string): Promise<Uint8Array | null> {
  */
 export async function deleteAsset(alias: string): Promise<void> {
   try {
-    await asset.remove({ name: alias, attributes: {} });
+    const query: asset.AssetMap = new Map<asset.Tag, asset.DataType>();
+    query.set(asset.Tag.ALIAS, new TextEncoder().encode(alias));
+    await asset.remove(query);
   } catch (_e) {
     // Asset may not exist
   }
