@@ -46,13 +46,16 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           pip install awscli
-          aws s3 cp s3://fileshare/commandline-tools-linux-x64-6.1.0.830.zip /tmp/commandline-tools.zip \
+          cd /tmp
+          aws s3 cp s3://fileshare/commandline-tools-linux-x64-6.1.0.830.zip commandline-tools.zip \
             --endpoint-url https://0ab2cd634e9cc88931d5697f43ed56cf.r2.cloudflarestorage.com
+          ls -lh commandline-tools.zip
           sudo mkdir -p /opt/command-line-tools
-          sudo unzip -q /tmp/commandline-tools.zip -d /tmp/cli-extract
-          sudo mv /tmp/cli-extract/command-line-tools/* /opt/command-line-tools/
+          sudo unzip -q commandline-tools.zip -d cli-extract
+          ls cli-extract/
+          sudo mv cli-extract/command-line-tools/* /opt/command-line-tools/
           sudo chmod -R 755 /opt/command-line-tools
-          rm -rf /tmp/cli-extract /tmp/commandline-tools.zip
+          rm -rf cli-extract commandline-tools.zip
 
       - name: Setup Environment
         run: |
