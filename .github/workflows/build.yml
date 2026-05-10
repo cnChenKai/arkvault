@@ -88,6 +88,10 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          ls -la /opt/command-line-tools/ohpm/bin/ohpm
+          which ohpm || echo "ohpm not in PATH"
+          echo "PATH=$PATH"
+          /opt/command-line-tools/ohpm/bin/ohpm --version || true
           ohpm install
 
       - name: Build HAP
