@@ -1,0 +1,52 @@
+# ArkVault — Cursor Rules
+
+## Project Overview
+ArkVault is a native HarmonyOS NEXT password manager built with ArkTS + ArkUI.
+
+## Language & Framework
+- Use ArkTS strict mode (NOT TypeScript)
+- ArkTS forbids: `any`, `unknown`, dynamic object layout, most destructuring
+- All types must be explicitly declared — no implicit `any`
+- Use `T[]` not `Array<T>` for array types
+- Use `Record<string, Object>` instead of plain `{}` for maps
+- Strings use single quotes: `'hello'`
+- Indentation: 2 spaces, no tabs
+- Max line width: 120 characters
+- One variable declaration per statement (no `let a = 1, b = 2`)
+
+## Naming Conventions
+- Classes/enums/namespaces: UpperCamelCase (`PasswordEntry`, `UserType`)
+- Variables/methods/params: lowerCamelCase (`findUser`, `isLoading`)
+- Constants/enum values: UPPER_SNAKE_CASE (`MAX_RETRY_COUNT`, `TEACHER`)
+- Boolean vars: prefix with `is/has/can/should` (`isLocked`, `hasExpired`)
+- Avoid negative booleans (`isNoError` → use `isError`)
+
+## Security Rules (CRITICAL for password manager)
+- Master password must NEVER be stored or logged in plaintext
+- All sensitive data MUST go through Asset Store Kit — never use Preferences or plain files
+- Encryption keys MUST use Universal Keystore Kit (hardware-backed), never soft-store
+- Never use `console.log` / `console.info` to output passwords, keys, or tokens
+- Clipboard must auto-clear after 30 seconds
+- PBKDF2 iterations ≥ 600,000 for key derivation
+- Use AES-256-GCM (not CBC) for symmetric encryption
+
+## Architecture
+- Layered: UI (pages/components) → Service Layer → Data Layer (models/DAO)
+- Crypto operations live in `crypto/` module — UI never calls crypto APIs directly
+- All DB access through DAO pattern — no raw SQL in business logic
+- Import/export parsers are pure functions with no side effects
+
+## HarmonyOS API Usage
+- Reference `docs/skills/harmonyos-development.md` for ArkTS/ArkUI API patterns
+- Reference `docs/arkts-coding-style-guide.md` for official coding conventions
+- Use `@State`, `@Prop`, `@Link` for component state (V1 decorators)
+- Use `@Observed` + `@ObjectLink` for nested object observation
+- Prefer `LazyForEach` for large lists
+- Navigation: use `NavPathStack` with named routes
+
+## Code Style
+- Arrow functions for event handlers
+- Access modifiers on all class properties (`private`, `public`, `protected`)
+- Use braces for all `if/for/while` blocks
+- Operator at end of line when wrapping expressions
+- `else`/`catch` on same line as closing brace: `} else {`
