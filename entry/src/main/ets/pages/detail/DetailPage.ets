@@ -103,12 +103,12 @@ struct DetailPage {
         Column({ space: 16 }) {
           // Title
           this.buildField('标题', this.entry.title, (v: string) => {
-            this.entry = Object.assign({}, this.entry, { title: v }) as PasswordEntry;
+            this.entry = { id: this.entry.id, title: v, username: this.entry.username, password: this.entry.password, url: this.entry.url, notes: this.entry.notes, folder: this.entry.folder, tags: this.entry.tags, favorite: this.entry.favorite, createdAt: this.entry.createdAt, updatedAt: this.entry.updatedAt, passwordHistory: this.entry.passwordHistory } as PasswordEntry;
           })
 
           // Username
           this.buildFieldWithCopy('用户名', this.entry.username, this.isEditing,
-            (v: string) => { this.entry = Object.assign({}, this.entry, { username: v }) as PasswordEntry; },
+            (v: string) => { this.entry = { id: this.entry.id, title: this.entry.title, username: v, password: this.entry.password, url: this.entry.url, notes: this.entry.notes, folder: this.entry.folder, tags: this.entry.tags, favorite: this.entry.favorite, createdAt: this.entry.createdAt, updatedAt: this.entry.updatedAt, passwordHistory: this.entry.passwordHistory } as PasswordEntry; },
             () => { ClipboardService.copyToClipboard(this.entry.username, '用户名已复制'); })
 
           // Password
@@ -121,7 +121,7 @@ struct DetailPage {
                 TextInput({ text: this.entry.password })
                   .type(InputType.Password)
                   .onChange((v: string) => {
-                    this.entry = Object.assign({}, this.entry, { password: v }) as PasswordEntry;
+                    this.entry = { id: this.entry.id, title: this.entry.title, username: this.entry.username, password: v, url: this.entry.url, notes: this.entry.notes, folder: this.entry.folder, tags: this.entry.tags, favorite: this.entry.favorite, createdAt: this.entry.createdAt, updatedAt: this.entry.updatedAt, passwordHistory: this.entry.passwordHistory } as PasswordEntry;
                   })
                   .layoutWeight(1)
               } else {
@@ -144,12 +144,12 @@ struct DetailPage {
 
           // URL
           this.buildFieldWithCopy('网址', this.entry.url, this.isEditing,
-            (v: string) => { this.entry = Object.assign({}, this.entry, { url: v }) as PasswordEntry; },
+            (v: string) => { this.entry = { id: this.entry.id, title: this.entry.title, username: this.entry.username, password: this.entry.password, url: v, notes: this.entry.notes, folder: this.entry.folder, tags: this.entry.tags, favorite: this.entry.favorite, createdAt: this.entry.createdAt, updatedAt: this.entry.updatedAt, passwordHistory: this.entry.passwordHistory } as PasswordEntry; },
             () => { ClipboardService.copyToClipboard(this.entry.url, '网址已复制'); })
 
           // Notes
           this.buildField('备注', this.entry.notes, (v: string) => {
-            this.entry = Object.assign({}, this.entry, { notes: v }) as PasswordEntry;
+            this.entry = { id: this.entry.id, title: this.entry.title, username: this.entry.username, password: this.entry.password, url: this.entry.url, notes: v, folder: this.entry.folder, tags: this.entry.tags, favorite: this.entry.favorite, createdAt: this.entry.createdAt, updatedAt: this.entry.updatedAt, passwordHistory: this.entry.passwordHistory } as PasswordEntry;
           }, true)
 
           // Favorite toggle
@@ -160,7 +160,7 @@ struct DetailPage {
             Blank()
             Toggle({ type: ToggleType.Switch, isOn: this.entry.favorite })
               .onChange((isOn: boolean) => {
-                this.entry = Object.assign({}, this.entry, { favorite: isOn }) as PasswordEntry;
+                this.entry = { id: this.entry.id, title: this.entry.title, username: this.entry.username, password: this.entry.password, url: this.entry.url, notes: this.entry.notes, folder: this.entry.folder, tags: this.entry.tags, favorite: isOn, createdAt: this.entry.createdAt, updatedAt: this.entry.updatedAt, passwordHistory: this.entry.passwordHistory } as PasswordEntry;
               })
           }
           .width('100%')

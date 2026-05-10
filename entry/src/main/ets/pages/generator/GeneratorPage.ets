@@ -12,7 +12,7 @@ import * as ClipboardService from '../../services/ClipboardService';
 @Component
 struct GeneratorPage {
   @State password: string = '';
-  @State options: GeneratorOptions = Object.assign({}, DEFAULT_GENERATOR_OPTIONS);
+  @State options: GeneratorOptions = { length: DEFAULT_GENERATOR_OPTIONS.length, useUppercase: DEFAULT_GENERATOR_OPTIONS.useUppercase, useLowercase: DEFAULT_GENERATOR_OPTIONS.useLowercase, useDigits: DEFAULT_GENERATOR_OPTIONS.useDigits, useSymbols: DEFAULT_GENERATOR_OPTIONS.useSymbols, excludeAmbiguous: DEFAULT_GENERATOR_OPTIONS.excludeAmbiguous };
   @State strengthScore: number = 0;
   @State strengthLabel: string = '';
 
@@ -117,30 +117,30 @@ struct GeneratorPage {
             step: 1
           })
             .onChange((value: number) => {
-              this.options = Object.assign({}, this.options, { length: value }) as GeneratorOptions;
+              this.options = { length: value, useUppercase: this.options.useUppercase, useLowercase: this.options.useLowercase, useDigits: this.options.useDigits, useSymbols: this.options.useSymbols, excludeAmbiguous: this.options.excludeAmbiguous } as GeneratorOptions;
               this.regenerate();
             })
         }
 
         // Toggle options
         this.buildToggle('大写字母 (A-Z)', this.options.useUppercase, (v: boolean) => {
-          this.options = Object.assign({}, this.options, { useUppercase: v }) as GeneratorOptions;
+          this.options = { length: this.options.length, useUppercase: v, useLowercase: this.options.useLowercase, useDigits: this.options.useDigits, useSymbols: this.options.useSymbols, excludeAmbiguous: this.options.excludeAmbiguous } as GeneratorOptions;
           this.regenerate();
         })
         this.buildToggle('小写字母 (a-z)', this.options.useLowercase, (v: boolean) => {
-          this.options = Object.assign({}, this.options, { useLowercase: v }) as GeneratorOptions;
+          this.options = { length: this.options.length, useUppercase: this.options.useUppercase, useLowercase: v, useDigits: this.options.useDigits, useSymbols: this.options.useSymbols, excludeAmbiguous: this.options.excludeAmbiguous } as GeneratorOptions;
           this.regenerate();
         })
         this.buildToggle('数字 (0-9)', this.options.useDigits, (v: boolean) => {
-          this.options = Object.assign({}, this.options, { useDigits: v }) as GeneratorOptions;
+          this.options = { length: this.options.length, useUppercase: this.options.useUppercase, useLowercase: this.options.useLowercase, useDigits: v, useSymbols: this.options.useSymbols, excludeAmbiguous: this.options.excludeAmbiguous } as GeneratorOptions;
           this.regenerate();
         })
         this.buildToggle('符号 (!@#$...)', this.options.useSymbols, (v: boolean) => {
-          this.options = Object.assign({}, this.options, { useSymbols: v }) as GeneratorOptions;
+          this.options = { length: this.options.length, useUppercase: this.options.useUppercase, useLowercase: this.options.useLowercase, useDigits: this.options.useDigits, useSymbols: v, excludeAmbiguous: this.options.excludeAmbiguous } as GeneratorOptions;
           this.regenerate();
         })
         this.buildToggle('排除易混淆字符', this.options.excludeAmbiguous, (v: boolean) => {
-          this.options = Object.assign({}, this.options, { excludeAmbiguous: v }) as GeneratorOptions;
+          this.options = { length: this.options.length, useUppercase: this.options.useUppercase, useLowercase: this.options.useLowercase, useDigits: this.options.useDigits, useSymbols: this.options.useSymbols, excludeAmbiguous: v } as GeneratorOptions;
           this.regenerate();
         })
       }
