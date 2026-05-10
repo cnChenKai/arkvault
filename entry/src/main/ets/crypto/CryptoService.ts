@@ -4,7 +4,7 @@
 //
 // SECURITY: Never log, export, or persist raw keys outside approved secure storage.
 
-import cryptoFramework from '@ohos.security.cryptoFramework';
+import { cryptoFramework } from '@kit.CryptoArchitectureKit';
 import { util } from '@kit.ArkTS';
 
 const PBKDF2_ITERATIONS: number = 600000;
@@ -61,21 +61,19 @@ export async function deriveMasterKey(
   const salt: Uint8Array = existingSalt ?? generateRandomBytes(32);
   const passwordBytes: Uint8Array = stringToBytes(password);
 
-  const pbkdf2Generator: cryptoFramework.PBKDF2 =
-    cryptoFramework.createPBKDF2('PBKDF2|SHA256');
-  const keySpec: cryptoFramework.PBKDF2Spec = {
+  const spec: cryptoFramework.PBKDF2Spec = {
+    algName: 'PBKDF2',
     password: passwordBytes,
     salt: salt,
     iterations: PBKDF2_ITERATIONS,
-    keySize: AES_KEY_SIZE
+    keySize: AES_KEY_SIZE / 8
   };
 
-  const derivedKey: cryptoFramework.SymKey =
-    await pbkdf2Generator.generateKey(keySpec);
-  const keyData: Uint8Array = derivedKey.getEncoded().data;
+  const kdf: cryptoFramework.Kdf = cryptoFramework.createKdf('PBKDF2|SHA256');
+  const secret: cryptoFramework.DataBlob = await kdf.generateSecret(spec);
 
   return {
-    keyData: keyData,
+    keyData: secret.data,
     salt: salt,
     iterations: PBKDF2_ITERATIONS
   };
@@ -91,8 +89,7 @@ export async function encryptAesGcm(
 ): Promise<EncryptedResult> {
   const nonce: Uint8Array = generateRandomBytes(GCM_IV_LENGTH);
 
-  const symKey: cryptoFramework.SymKey =
-    buildSymKey(key);
+  const symKey: cryptoFramework.SymKey = buildSymKey(key);
   const cipher: cryptoFramework.Cipher =
     cryptoFramework.createCipher('AES256|GCM|PKCS7');
 

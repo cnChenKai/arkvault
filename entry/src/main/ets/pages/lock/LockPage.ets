@@ -1,10 +1,9 @@
 // pages/lock/LockPage.ets
-// Lock screen — master password entry and biometric unlock.
+// Lock screen — master password entry.
 
 import { router, promptAction } from '@kit.ArkUI';
-import { userAuth } from '@kit.UserAuthenticationKit';
-import { util } from '@kit.ArkTS';
 import * as VaultService from '../../services/VaultService';
+import { common } from '@kit.AbilityKit';
 
 @Entry
 @Component
@@ -29,7 +28,7 @@ struct LockPage {
 
     try {
       if (this.isFirstTime) {
-        await VaultService.initializeVault(getContext(), this.masterPassword);
+        await VaultService.initializeVault(getContext() as common.UIAbilityContext, this.masterPassword);
         router.replaceUrl({ url: 'pages/vaultlist/VaultListPage' });
       } else {
         const success: boolean = await VaultService.unlockWithPassword(this.masterPassword);
@@ -43,27 +42,6 @@ struct LockPage {
       this.errorMessage = '解锁失败，请重试';
     } finally {
       this.isLoading = false;
-    }
-  }
-
-  async handleBiometricUnlock(): Promise<void> {
-    try {
-      const authParam: userAuth.AuthParam = {
-        challenge: new Uint8Array(32),
-        authType: [userAuth.UserAuthType.FINGERPRINT, userAuth.UserAuthType.FACE],
-        authTrustLevel: userAuth.AuthTrustLevel.ATL1
-      };
-
-      const userAuthInstance: userAuth.UserAuth = userAuth.getUserAuth(authParam, {
-        title: '解锁 ArkVault'
-      });
-      const result: userAuth.UserAuthResult = await userAuthInstance.auth();
-
-      if (result.result === userAuth.UserAuthResultCode.SUCCESS) {
-        router.replaceUrl({ url: 'pages/vaultlist/VaultListPage' });
-      }
-    } catch (_e) {
-      promptAction.showToast({ message: '生物识别不可用' });
     }
   }
 
@@ -112,17 +90,6 @@ struct LockPage {
           .backgroundColor('#007DFF')
           .onClick(() => { this.handleUnlock(); })
           .enabled(!this.isLoading)
-
-        if (!this.isFirstTime) {
-          Button('使用生物识别')
-            .type(ButtonType.Capsule)
-            .width('100%')
-            .height(48)
-            .backgroundColor('#F5F5F5')
-            .fontColor('#007DFF')
-            .margin({ top: 12 })
-            .onClick(() => { this.handleBiometricUnlock(); })
-        }
       }
       .margin({ top: 32, left: 32, right: 32 })
 
