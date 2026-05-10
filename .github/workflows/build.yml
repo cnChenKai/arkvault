@@ -55,7 +55,8 @@ jobs:
       - name: Setup Environment
         run: |
           echo "COMMANDLINE_TOOL_DIR=/opt/command-line-tools" >> $GITHUB_ENV
-          echo "DEVECO_SDK_ROOT=/opt/command-line-tools/sdk" >> $GITHUB_ENV
+          echo "DEVECO_SDK_HOME=/opt/command-line-tools/sdk" >> $GITHUB_ENV
+          echo "HOS_SDK_HOME=/opt/command-line-tools/sdk" >> $GITHUB_ENV
           echo "/opt/command-line-tools/ohpm/bin" >> $GITHUB_PATH
           echo "/opt/command-line-tools/hvigor/bin" >> $GITHUB_PATH
           echo "/opt/command-line-tools/sdk/default/openharmony/toolchains" >> $GITHUB_PATH
