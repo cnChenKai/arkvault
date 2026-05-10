@@ -1,0 +1,12 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "ArkVault password manager"
+    },
+    {
+      "name": "entry_label",
+      "value": "ArkVault"
+    }
+  ]
+}

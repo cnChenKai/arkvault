@@ -1,0 +1,10 @@
+{
+  "src": [
+    "pages/lock/LockPage",
+    "pages/vaultlist/VaultListPage",
+    "pages/detail/DetailPage",
+    "pages/generator/GeneratorPage",
+    "pages/import/ImportPage",
+    "pages/settings/SettingsPage"
+  ]
+}
