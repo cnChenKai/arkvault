@@ -49,17 +49,18 @@ jobs:
           aws s3 cp s3://fileshare/commandline-tools-linux-x64-6.1.0.830.zip /tmp/commandline-tools.zip \
             --endpoint-url https://0ab2cd634e9cc88931d5697f43ed56cf.r2.cloudflarestorage.com
           sudo mkdir -p /opt/command-line-tools
-          sudo unzip -q /tmp/commandline-tools.zip -d /opt/command-line-tools
+          sudo unzip -q /tmp/commandline-tools.zip -d /tmp/cli-extract
+          sudo mv /tmp/cli-extract/command-line-tools/* /opt/command-line-tools/
           sudo chmod -R 755 /opt/command-line-tools
-          rm /tmp/commandline-tools.zip
+          rm -rf /tmp/cli-extract /tmp/commandline-tools.zip
 
       - name: Setup Environment
         run: |
           echo "COMMANDLINE_TOOL_DIR=/opt/command-line-tools" >> $GITHUB_ENV
-          echo "DEVECO_SDK_ROOT=/opt/command-line-tools/command-line-tools/sdk" >> $GITHUB_ENV
+          echo "DEVECO_SDK_ROOT=/opt/command-line-tools/sdk" >> $GITHUB_ENV
           echo "/opt/command-line-tools/ohpm/bin" >> $GITHUB_PATH
           echo "/opt/command-line-tools/hvigor/bin" >> $GITHUB_PATH
-          echo "/opt/command-line-tools/command-line-tools/sdk/default/openharmony/toolchains" >> $GITHUB_PATH
+          echo "/opt/command-line-tools/sdk/default/openharmony/toolchains" >> $GITHUB_PATH
 
       - name: Setup Signing Files
         env:
@@ -88,10 +89,6 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          ls -la /opt/command-line-tools/ohpm/bin/ohpm
-          which ohpm || echo "ohpm not in PATH"
-          echo "PATH=$PATH"
-          /opt/command-line-tools/ohpm/bin/ohpm --version || true
           ohpm install
 
       - name: Build HAP
