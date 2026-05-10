@@ -36,10 +36,12 @@ export async function retrieveAsset(alias: string): Promise<Uint8Array | null> {
     const query = new Map();
     query.set(asset.Tag.ALIAS, new util.TextEncoder().encode(alias));
 
-    const result = await asset.query(query as asset.AssetMap);
-    const data = result.get(asset.Tag.SECRET);
-    if (data instanceof Uint8Array) {
-      return data;
+    const results = await asset.query(query as asset.AssetMap);
+    for (const result of results) {
+      const data = result.get(asset.Tag.SECRET);
+      if (data instanceof Uint8Array) {
+        return data;
+      }
     }
     return null;
   } catch (_e) {
