@@ -50,7 +50,7 @@ jobs:
           sudo unzip -q commandline-tools.zip -d /tmp/cli-extract
           sudo cp -r /tmp/cli-extract/command-line-tools/. /opt/command-line-tools/
           sudo chmod -R 755 /opt/command-line-tools
-          rm -rf /tmp/cli-extract /tmp/commandline-tools.zip
+          sudo rm -rf /tmp/cli-extract /tmp/commandline-tools.zip
 
       - name: Setup Environment
         run: |
