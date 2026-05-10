@@ -9,7 +9,9 @@ on:
 
 env:
   COMMANDLINE_TOOLS_VERSION: "6.1.0.830"
-  COMMANDLINE_TOOLS_URL: "https://0ab2cd634e9cc88931d5697f43ed56cf.r2.cloudflarestorage.com/fileshare/commandline-tools-linux-x64-6.1.0.830.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=3a04dbbda38fea225676c996f7c649f5%2F20260510%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260510T144232Z&X-Amz-Expires=315360000&X-Amz-SignedHeaders=host&X-Amz-Signature=0716c8f2b01d675cb5afdf2f9007e2cad765b437e53415634987ff7a590546f9"
+  COMMANDLINE_TOOLS_PART_AA: "https://0ab2cd634e9cc88931d5697f43ed56cf.r2.cloudflarestorage.com/fileshare/commandline-tools-linux-x64-6.1.0.830.zip.part_aa?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=3a04dbbda38fea225676c996f7c649f5%2F20260510%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260510T150321Z&X-Amz-Expires=315360000&X-Amz-SignedHeaders=host&X-Amz-Signature=7b57b41e52ca8ef9eda17817fd4670b4267ef61ac0efb85145087fb2a3ec6e1d"
+  COMMANDLINE_TOOLS_PART_AB: "https://0ab2cd634e9cc88931d5697f43ed56cf.r2.cloudflarestorage.com/fileshare/commandline-tools-linux-x64-6.1.0.830.zip.part_ab?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=3a04dbbda38fea225676c996f7c649f5%2F20260510%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260510T150321Z&X-Amz-Expires=315360000&X-Amz-SignedHeaders=host&X-Amz-Signature=ec66a7cc200d59414463434ae7ac9013649931862286cd9ec85dcca023b249c2"
+  COMMANDLINE_TOOLS_PART_AC: "https://0ab2cd634e9cc88931d5697f43ed56cf.r2.cloudflarestorage.com/fileshare/commandline-tools-linux-x64-6.1.0.830.zip.part_ac?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=3a04dbbda38fea225676c996f7c649f5%2F20260510%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260510T150322Z&X-Amz-Expires=315360000&X-Amz-SignedHeaders=host&X-Amz-Signature=8e1c4b6bd4df4d51a9ec34f89f3b4ff051932ad2a530d5416127487f2b202d31"
 
 jobs:
   build:
@@ -40,7 +42,11 @@ jobs:
       - name: Download Command Line Tools
         if: steps.cache-cli.outputs.cache-hit != 'true'
         run: |
-          wget -q -O /tmp/commandline-tools.zip "${{ env.COMMANDLINE_TOOLS_URL }}"
+          wget -q -O /tmp/commandline-tools.part_aa "${{ env.COMMANDLINE_TOOLS_PART_AA }}"
+          wget -q -O /tmp/commandline-tools.part_ab "${{ env.COMMANDLINE_TOOLS_PART_AB }}"
+          wget -q -O /tmp/commandline-tools.part_ac "${{ env.COMMANDLINE_TOOLS_PART_AC }}"
+          cat /tmp/commandline-tools.part_a* > /tmp/commandline-tools.zip
+          rm /tmp/commandline-tools.part_a*
           sudo mkdir -p /opt/command-line-tools
           sudo unzip -q /tmp/commandline-tools.zip -d /opt/command-line-tools
           rm /tmp/commandline-tools.zip
