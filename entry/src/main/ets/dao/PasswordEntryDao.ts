@@ -28,10 +28,9 @@ export async function upsertEntry(
     payload_key_ref: entry.payloadKeyRef
   };
 
-  await db.insertWithConflictResolution(
+  await db.insert(
     TABLE,
     bucket,
-    relationalStore.ConflictResolution.ON_CONFLICT_REPLACE
   );
 }
 

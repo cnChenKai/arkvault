@@ -83,7 +83,7 @@ export async function getDatabase(context: common.UIAbilityContext): Promise<rel
  */
 export function closeDatabase(): void {
   if (store !== null) {
-    store.destroy();
+    store.close();
     store = null;
   }
 }

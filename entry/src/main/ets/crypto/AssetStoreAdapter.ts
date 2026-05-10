@@ -1,3 +1,4 @@
+import { util } from '@kit.ArkTS';
 // crypto/AssetStoreAdapter.ts
 // Wrapper for HarmonyOS Asset Store Kit.
 // Stores protected vault key material, KDF metadata, and biometric unlock data.
@@ -20,7 +21,7 @@ interface AssetStoreOptions {
 export async function storeAsset(options: AssetStoreOptions): Promise<void> {
   const attributes: asset.AssetMap = new Map<asset.Tag, asset.DataType>();
   attributes.set(asset.Tag.SECRET, options.data);
-  attributes.set(asset.Tag.ALIAS, new TextEncoder().encode(options.alias));
+  attributes.set(asset.Tag.ALIAS, new util.TextEncoder().encode(options.alias));
   attributes.set(asset.Tag.REQUIRE_PASSWORD_SET, options.requireScreenUnlock === true);
   attributes.set(asset.Tag.SYNC_TYPE,
     options.allowCloudBackup === true
@@ -36,7 +37,7 @@ export async function storeAsset(options: AssetStoreOptions): Promise<void> {
 export async function retrieveAsset(alias: string): Promise<Uint8Array | null> {
   try {
     const query: asset.AssetMap = new Map<asset.Tag, asset.DataType>();
-    query.set(asset.Tag.ALIAS, new TextEncoder().encode(alias));
+    query.set(asset.Tag.ALIAS, new util.TextEncoder().encode(alias));
 
     const result: asset.AssetMap = await asset.query(query);
     const data = result.get(asset.Tag.SECRET);
@@ -55,7 +56,7 @@ export async function retrieveAsset(alias: string): Promise<Uint8Array | null> {
 export async function deleteAsset(alias: string): Promise<void> {
   try {
     const query: asset.AssetMap = new Map<asset.Tag, asset.DataType>();
-    query.set(asset.Tag.ALIAS, new TextEncoder().encode(alias));
+    query.set(asset.Tag.ALIAS, new util.TextEncoder().encode(alias));
     await asset.remove(query);
   } catch (_e) {
     // Asset may not exist
