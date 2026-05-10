@@ -2,10 +2,10 @@
 // Main vault list with search, folder filter, and favorites.
 
 import { router } from '@kit.ArkUI';
-import { VaultService } from '../../services/VaultService';
+import * as VaultService from '../../services/VaultService';
 import { PasswordEntry, EncryptedPasswordEntry } from '../../models/PasswordEntry';
-import { PasswordEntryDao } from '../../dao/PasswordEntryDao';
-import { ClipboardService } from '../../services/ClipboardService';
+import * as PasswordEntryDao from '../../dao/PasswordEntryDao';
+import * as ClipboardService from '../../services/ClipboardService';
 import { common } from '@kit.AbilityKit';
 
 @Entry

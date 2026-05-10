@@ -1,7 +1,7 @@
 // dao/DatabaseHelper.ts
 // RDB database initialization and migration for ArkVault.
 
-import { relationalStore } from '@ohos.data.relationalStore';
+import relationalStore from '@ohos.data.relationalStore';
 import { common } from '@kit.AbilityKit';
 
 const DB_NAME: string = 'arkvault.db';

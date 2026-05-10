@@ -12,6 +12,7 @@ import {
 } from '../crypto/CryptoService';
 import { storeAsset, retrieveAsset, deleteAsset, assetExists } from '../crypto/AssetStoreAdapter';
 import { common } from '@kit.AbilityKit';
+import { util } from '@kit.ArkTS';
 
 const ASSET_VAULT_KEY: string = 'arkvault.vault.key';
 const ASSET_KDF_SALT: string = 'arkvault.kdf.salt';
@@ -154,7 +155,7 @@ export async function encryptEntry(entry: PasswordEntry): Promise<EncryptedPassw
     passwordHistory: entry.passwordHistory
   });
 
-  const encoder: TextEncoder = new TextEncoder();
+  const encoder: util.TextEncoder = new util.TextEncoder();
   const plaintext: Uint8Array = encoder.encode(sensitiveData);
 
   // Encrypt
@@ -190,9 +191,10 @@ export async function decryptEntry(encrypted: EncryptedPasswordEntry): Promise<P
     encrypted.payloadNonce
   );
 
-  const decoder: TextDecoder = new TextDecoder();
+  const decoder: util.TextDecoder = new util.TextDecoder();
   const json: string = decoder.decode(plaintext);
-  const sensitive = JSON.parse(json) as Record<string, Object>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sensitive: Record<string, Object> = JSON.parse(json) as Record<string, Object>;
 
   return {
     id: encrypted.id,

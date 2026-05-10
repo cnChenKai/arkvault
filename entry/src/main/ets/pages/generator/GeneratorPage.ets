@@ -6,13 +6,13 @@ import {
   GeneratorOptions, DEFAULT_GENERATOR_OPTIONS,
   generatePassword, calculateStrength, getStrengthLabel
 } from '../../services/PasswordGenerator';
-import { ClipboardService } from '../../services/ClipboardService';
+import * as ClipboardService from '../../services/ClipboardService';
 
 @Entry
 @Component
 struct GeneratorPage {
   @State password: string = '';
-  @State options: GeneratorOptions = { ...DEFAULT_GENERATOR_OPTIONS };
+  @State options: GeneratorOptions = Object.assign({}, DEFAULT_GENERATOR_OPTIONS);
   @State strengthScore: number = 0;
   @State strengthLabel: string = '';
 
@@ -117,30 +117,30 @@ struct GeneratorPage {
             step: 1
           })
             .onChange((value: number) => {
-              this.options = { ...this.options, length: value } as GeneratorOptions;
+              this.options = Object.assign({}, this.options, { length: value }) as GeneratorOptions;
               this.regenerate();
             })
         }
 
         // Toggle options
         this.buildToggle('大写字母 (A-Z)', this.options.useUppercase, (v: boolean) => {
-          this.options = { ...this.options, useUppercase: v } as GeneratorOptions;
+          this.options = Object.assign({}, this.options, { useUppercase: v }) as GeneratorOptions;
           this.regenerate();
         })
         this.buildToggle('小写字母 (a-z)', this.options.useLowercase, (v: boolean) => {
-          this.options = { ...this.options, useLowercase: v } as GeneratorOptions;
+          this.options = Object.assign({}, this.options, { useLowercase: v }) as GeneratorOptions;
           this.regenerate();
         })
         this.buildToggle('数字 (0-9)', this.options.useDigits, (v: boolean) => {
-          this.options = { ...this.options, useDigits: v } as GeneratorOptions;
+          this.options = Object.assign({}, this.options, { useDigits: v }) as GeneratorOptions;
           this.regenerate();
         })
         this.buildToggle('符号 (!@#$...)', this.options.useSymbols, (v: boolean) => {
-          this.options = { ...this.options, useSymbols: v } as GeneratorOptions;
+          this.options = Object.assign({}, this.options, { useSymbols: v }) as GeneratorOptions;
           this.regenerate();
         })
         this.buildToggle('排除易混淆字符', this.options.excludeAmbiguous, (v: boolean) => {
-          this.options = { ...this.options, excludeAmbiguous: v } as GeneratorOptions;
+          this.options = Object.assign({}, this.options, { excludeAmbiguous: v }) as GeneratorOptions;
           this.regenerate();
         })
       }

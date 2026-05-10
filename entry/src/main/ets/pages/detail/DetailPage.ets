@@ -4,9 +4,9 @@
 import { router } from '@kit.ArkUI';
 import { promptAction } from '@kit.ArkUI';
 import { PasswordEntry, createEmptyEntry } from '../../models/PasswordEntry';
-import { VaultService } from '../../services/VaultService';
-import { ClipboardService } from '../../services/ClipboardService';
-import { PasswordEntryDao } from '../../dao/PasswordEntryDao';
+import * as VaultService from '../../services/VaultService';
+import * as ClipboardService from '../../services/ClipboardService';
+import * as PasswordEntryDao from '../../dao/PasswordEntryDao';
 import { common } from '@kit.AbilityKit';
 
 @Entry
@@ -20,7 +20,7 @@ struct DetailPage {
 
   async aboutToAppear(): Promise<void> {
     const params: Record<string, Object> = router.getParams() as Record<string, Object>;
-    if (params !== undefined && params !== null && 'entryId' in params) {
+    if (params !== undefined && params !== null && params['entryId'] !== undefined) {
       this.entryId = params['entryId'] as string;
       await this.loadEntry();
     } else {
@@ -103,12 +103,12 @@ struct DetailPage {
         Column({ space: 16 }) {
           // Title
           this.buildField('标题', this.entry.title, (v: string) => {
-            this.entry = { ...this.entry, title: v } as PasswordEntry;
+            this.entry = Object.assign({}, this.entry, { title: v }) as PasswordEntry;
           })
 
           // Username
           this.buildFieldWithCopy('用户名', this.entry.username, this.isEditing,
-            (v: string) => { this.entry = { ...this.entry, username: v } as PasswordEntry; },
+            (v: string) => { this.entry = Object.assign({}, this.entry, { username: v }) as PasswordEntry; },
             () => { ClipboardService.copyToClipboard(this.entry.username, '用户名已复制'); })
 
           // Password
@@ -121,7 +121,7 @@ struct DetailPage {
                 TextInput({ text: this.entry.password })
                   .type(InputType.Password)
                   .onChange((v: string) => {
-                    this.entry = { ...this.entry, password: v } as PasswordEntry;
+                    this.entry = Object.assign({}, this.entry, { password: v }) as PasswordEntry;
                   })
                   .layoutWeight(1)
               } else {
@@ -144,12 +144,12 @@ struct DetailPage {
 
           // URL
           this.buildFieldWithCopy('网址', this.entry.url, this.isEditing,
-            (v: string) => { this.entry = { ...this.entry, url: v } as PasswordEntry; },
+            (v: string) => { this.entry = Object.assign({}, this.entry, { url: v }) as PasswordEntry; },
             () => { ClipboardService.copyToClipboard(this.entry.url, '网址已复制'); })
 
           // Notes
           this.buildField('备注', this.entry.notes, (v: string) => {
-            this.entry = { ...this.entry, notes: v } as PasswordEntry;
+            this.entry = Object.assign({}, this.entry, { notes: v }) as PasswordEntry;
           }, true)
 
           // Favorite toggle
@@ -160,7 +160,7 @@ struct DetailPage {
             Blank()
             Toggle({ type: ToggleType.Switch, isOn: this.entry.favorite })
               .onChange((isOn: boolean) => {
-                this.entry = { ...this.entry, favorite: isOn } as PasswordEntry;
+                this.entry = Object.assign({}, this.entry, { favorite: isOn }) as PasswordEntry;
               })
           }
           .width('100%')

@@ -1,7 +1,7 @@
 // dao/PasswordEntryDao.ts
 // CRUD operations for encrypted password entries in RDB.
 
-import { relationalStore } from '@ohos.data.relationalStore';
+import relationalStore from '@ohos.data.relationalStore';
 import { EncryptedPasswordEntry } from '../models/PasswordEntry';
 import { getDatabase } from './DatabaseHelper';
 import { common } from '@kit.AbilityKit';

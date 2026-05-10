@@ -1,10 +1,10 @@
 // pages/lock/LockPage.ets
 // Lock screen — master password entry and biometric unlock.
 
-import { router } from '@kit.ArkUI';
-import { promptAction } from '@kit.ArkUI';
+import { router, promptAction } from '@kit.ArkUI';
 import { userAuth } from '@kit.UserAuthenticationKit';
-import { VaultService } from '../../services/VaultService';
+import { util } from '@kit.ArkTS';
+import * as VaultService from '../../services/VaultService';
 
 @Entry
 @Component
@@ -48,16 +48,16 @@ struct LockPage {
 
   async handleBiometricUnlock(): Promise<void> {
     try {
-      const authParam: userAuth.UserAuthParam = {
+      const authParam: userAuth.AuthParam = {
         challenge: new Uint8Array(32),
         authType: [userAuth.UserAuthType.FINGERPRINT, userAuth.UserAuthType.FACE],
         authTrustLevel: userAuth.AuthTrustLevel.ATL1
       };
 
-      const result: userAuth.UserAuthResult =
-        await userAuth.getUserAuth(authParam, {
-          title: '解锁 ArkVault'
-        });
+      const userAuthInstance: userAuth.UserAuth = userAuth.getUserAuth(authParam, {
+        title: '解锁 ArkVault'
+      });
+      const result: userAuth.UserAuthResult = await userAuthInstance.auth();
 
       if (result.result === userAuth.UserAuthResultCode.SUCCESS) {
         router.replaceUrl({ url: 'pages/vaultlist/VaultListPage' });
@@ -126,7 +126,7 @@ struct LockPage {
       }
       .margin({ top: 32, left: 32, right: 32 })
 
-      Spacer()
+      Row().layoutWeight(1)
     }
     .width('100%')
     .height('100%')

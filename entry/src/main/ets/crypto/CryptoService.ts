@@ -4,8 +4,8 @@
 //
 // SECURITY: Never log, export, or persist raw keys outside approved secure storage.
 
-import { cryptoFramework } from '@ohos.security.cryptoFramework';
-import { universalKeystoreKit } from '@ohos.security.universalKeystore';
+import cryptoFramework from '@ohos.security.cryptoFramework';
+import { util } from '@kit.ArkTS';
 
 const PBKDF2_ITERATIONS: number = 600000;
 const AES_KEY_SIZE: number = 256;
@@ -170,6 +170,6 @@ function buildSymKey(keyBytes: Uint8Array): cryptoFramework.SymKey {
 }
 
 function stringToBytes(str: string): Uint8Array {
-  const encoder: TextEncoder = new TextEncoder();
+  const encoder: util.TextEncoder = new util.TextEncoder();
   return encoder.encode(str);
 }

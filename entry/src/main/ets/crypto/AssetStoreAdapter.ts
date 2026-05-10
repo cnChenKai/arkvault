@@ -5,7 +5,7 @@
 // SECURITY: Asset Store Kit values are encrypted by the OS and bound to
 // device security state. Never mirror these values into RDB or preferences.
 
-import { assetStoreKit } from '@ohos.security.assetStoreKit';
+import { assetStoreKit } from '@kit.AssetStoreKit';
 
 const TAG: string = 'AssetStoreAdapter';
 

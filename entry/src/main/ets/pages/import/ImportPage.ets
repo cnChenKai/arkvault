@@ -4,11 +4,12 @@
 import { router } from '@kit.ArkUI';
 import { promptAction } from '@kit.ArkUI';
 import { picker } from '@kit.CoreFileKit';
-import { fs } from '@kit.CoreFileKit';
+import { fileIo as fs } from '@kit.CoreFileKit';
 import { ImportFormat, ImportRecord, ImportResult, detectImportFormat } from '../../models/ImportFormat';
 import { PasswordEntry, createEmptyEntry } from '../../models/PasswordEntry';
-import { VaultService } from '../../services/VaultService';
-import { PasswordEntryDao } from '../../dao/PasswordEntryDao';
+import * as VaultService from '../../services/VaultService';
+import * as PasswordEntryDao from '../../dao/PasswordEntryDao';
+import { util } from '@kit.ArkTS';
 import { generateId } from '../../crypto/CryptoService';
 import { common } from '@kit.AbilityKit';
 
@@ -42,7 +43,7 @@ struct ImportPage {
       fs.readSync(file.fd, buffer);
       fs.closeSync(file);
 
-      const decoder: TextDecoder = new TextDecoder();
+      const decoder: util.TextDecoder = new util.TextDecoder();
       this.fileContent = decoder.decode(new Uint8Array(buffer));
 
       // Detect format
