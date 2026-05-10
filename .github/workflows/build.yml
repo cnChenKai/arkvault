@@ -9,7 +9,7 @@ on:
 
 env:
   COMMANDLINE_TOOLS_VERSION: "6.1.0.830"
-  COMMANDLINE_TOOLS_URL: "https://contentcenter-vali-drcn.dbankcdn.cn/pvt_2/DeveloperAlliance_package_901_9/2f/v3/DjL2EEWbQOeKv76_lGLLHw/commandline-tools-linux-x64-6.1.0.830.zip?HW-CC-KV=V1&HW-CC-Date=20260510T114549Z&HW-CC-Expire=315360000&HW-CC-Sign=434B862140D686353C82830AB6257EB6949C613905A9BEF3B7E5D701FCB85845"
+  COMMANDLINE_TOOLS_URL: "https://0ab2cd634e9cc88931d5697f43ed56cf.r2.cloudflarestorage.com/fileshare/commandline-tools-linux-x64-6.1.0.830.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=3a04dbbda38fea225676c996f7c649f5%2F20260510%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260510T144232Z&X-Amz-Expires=315360000&X-Amz-SignedHeaders=host&X-Amz-Signature=0716c8f2b01d675cb5afdf2f9007e2cad765b437e53415634987ff7a590546f9"
 
 jobs:
   build:
