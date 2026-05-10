@@ -84,9 +84,14 @@ jobs:
         run: |
           sed 's/__P12_PASSWORD__/${{ secrets.P12_PASSWORD }}/g' build-profile.ci.json5 > build-profile.json5
 
+      - name: Configure npm registry
+        run: |
+          npm config set @ohos:registry=https://repo.harmonyos.com/npm/
+          echo '@ohos:registry=https://repo.harmonyos.com/npm/' >> ~/.npmrc
+
       - name: Install Dependencies
         run: |
-          ohpm install
+          ohpm install --registry https://repo.harmonyos.com/ohpm/
 
       - name: Build HAP
         run: |
