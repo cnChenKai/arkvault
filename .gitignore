@@ -28,3 +28,4 @@ Thumbs.db
 signing/*.p12
 signing/*.cer
 signing/*.key
+signing/*.p12
