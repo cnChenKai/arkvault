@@ -9,7 +9,8 @@
           "keyAlias": "arkvault",
           "keyPassword": "__P12_PASSWORD__",
           "profile": "signing/material/ac/cc8d08e1d89a406282a4ce6f726745f7",
-          "certpath": "signing/arkvault.cer"
+          "certpath": "signing/arkvault.cer",
+          "signAlg": "SHA256withECDSA"
         }
       }
     ],
