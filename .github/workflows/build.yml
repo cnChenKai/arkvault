@@ -52,8 +52,8 @@ jobs:
           ls -lh commandline-tools.zip
           sudo mkdir -p /opt/command-line-tools
           sudo unzip -q commandline-tools.zip -d cli-extract
-          ls cli-extract/
-          sudo mv cli-extract/command-line-tools/* /opt/command-line-tools/
+          ls -la cli-extract/command-line-tools/ | head -10
+          sudo cp -r cli-extract/command-line-tools/. /opt/command-line-tools/
           sudo chmod -R 755 /opt/command-line-tools
           rm -rf cli-extract commandline-tools.zip
 
