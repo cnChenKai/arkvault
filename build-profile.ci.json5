@@ -1,8 +1,8 @@
 {
-  "apiType": "stageMode",
-  "buildOption": {
-    "signingConfigs": {
-      "default": {
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
         "material": {
           "storeFile": "signing/arkvault.p12",
           "storePassword": "__P12_PASSWORD__",
@@ -11,13 +11,31 @@
         },
         "certfile": "signing/arkvault.cer"
       }
-    }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.1(13)",
+        "runtimeOS": "HarmonyOS",
+        "targetSdkVersion": "5.0.1(13)"
+      }
+    ],
+    "buildModeSet": [
+      { "name": "debug" },
+      { "name": "release" }
+    ]
   },
-  "targets": [
+  "modules": [
     {
-      "name": "default",
-      "runtimeOS": "HarmonyOS",
-      "signingConfig": "default"
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": ["default"]
+        }
+      ]
     }
   ]
 }
