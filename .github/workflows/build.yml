@@ -41,12 +41,13 @@ jobs:
 
       - name: Download Command Line Tools
         if: steps.cache-cli.outputs.cache-hit != 'true'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
-          wget -q -O /tmp/commandline-tools.part_aa "${{ env.COMMANDLINE_TOOLS_PART_AA }}"
-          wget -q -O /tmp/commandline-tools.part_ab "${{ env.COMMANDLINE_TOOLS_PART_AB }}"
-          wget -q -O /tmp/commandline-tools.part_ac "${{ env.COMMANDLINE_TOOLS_PART_AC }}"
-          cat /tmp/commandline-tools.part_a* > /tmp/commandline-tools.zip
-          rm /tmp/commandline-tools.part_a*
+          pip install awscli
+          aws s3 cp s3://fileshare/commandline-tools-linux-x64-6.1.0.830.zip /tmp/commandline-tools.zip \
+            --endpoint-url https://0ab2cd634e9cc88931d5697f43ed56cf.r2.cloudflarestorage.com
           sudo mkdir -p /opt/command-line-tools
           sudo unzip -q /tmp/commandline-tools.zip -d /opt/command-line-tools
           rm /tmp/commandline-tools.zip
