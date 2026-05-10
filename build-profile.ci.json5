@@ -1,0 +1,23 @@
+{
+  "apiType": "stageMode",
+  "buildOption": {
+    "signingConfigs": {
+      "default": {
+        "material": {
+          "storeFile": "signing/arkvault.p12",
+          "storePassword": "__P12_PASSWORD__",
+          "keyAlias": "arkvault",
+          "keyPassword": "__P12_PASSWORD__"
+        },
+        "certfile": "signing/arkvault.cer"
+      }
+    }
+  },
+  "targets": [
+    {
+      "name": "default",
+      "runtimeOS": "HarmonyOS",
+      "signingConfig": "default"
+    }
+  ]
+}

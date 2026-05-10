@@ -1,0 +1,94 @@
+name: Build ArkVault
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  COMMANDLINE_TOOLS_VERSION: "6.1.0.830"
+  COMMANDLINE_TOOLS_URL: "https://contentcenter-vali-drcn.dbankcdn.cn/pvt_2/DeveloperAlliance_package_901_9/2f/v3/DjL2EEWbQOeKv76_lGLLHw/commandline-tools-linux-x64-6.1.0.830.zip?HW-CC-KV=V1&HW-CC-Date=20260510T114549Z&HW-CC-Expire=315360000&HW-CC-Sign=434B862140D686353C82830AB6257EB6949C613905A9BEF3B7E5D701FCB85845"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Cache Command Line Tools
+        id: cache-cli
+        uses: actions/cache@v4
+        with:
+          path: /opt/command-line-tools
+          key: harmonyos-cli-${{ env.COMMANDLINE_TOOLS_VERSION }}
+
+      - name: Download Command Line Tools
+        if: steps.cache-cli.outputs.cache-hit != 'true'
+        run: |
+          wget -q -O /tmp/commandline-tools.zip "${{ env.COMMANDLINE_TOOLS_URL }}"
+          sudo mkdir -p /opt/command-line-tools
+          sudo unzip -q /tmp/commandline-tools.zip -d /opt/command-line-tools
+          rm /tmp/commandline-tools.zip
+
+      - name: Setup Environment
+        run: |
+          echo "COMMANDLINE_TOOL_DIR=/opt/command-line-tools" >> $GITHUB_ENV
+          echo "DEVECO_SDK_ROOT=/opt/command-line-tools/command-line-tools/sdk" >> $GITHUB_ENV
+          echo "/opt/command-line-tools/ohpm/bin" >> $GITHUB_PATH
+          echo "/opt/command-line-tools/hvigor/bin" >> $GITHUB_PATH
+          echo "/opt/command-line-tools/command-line-tools/sdk/default/openharmony/toolchains" >> $GITHUB_PATH
+
+      - name: Setup Signing Files
+        env:
+          P12_BASE64: ${{ secrets.SIGNING_P12 }}
+          CER_BASE64: ${{ secrets.SIGNING_CER }}
+          MATERIAL_AC: ${{ secrets.MATERIAL_AC }}
+          MATERIAL_CE: ${{ secrets.MATERIAL_CE }}
+          MATERIAL_FD_0: ${{ secrets.MATERIAL_FD_0 }}
+          MATERIAL_FD_1: ${{ secrets.MATERIAL_FD_1 }}
+          MATERIAL_FD_2: ${{ secrets.MATERIAL_FD_2 }}
+        run: |
+          mkdir -p signing/material/ac signing/material/ce signing/material/fd/0 signing/material/fd/1 signing/material/fd/2
+          echo "$P12_BASE64" | base64 -d > signing/arkvault.p12
+          echo "$CER_BASE64" | base64 -d > signing/arkvault.cer
+          echo "$MATERIAL_AC" | base64 -d > signing/material/ac/cc8d08e1d89a406282a4ce6f726745f7
+          echo "$MATERIAL_CE" | base64 -d > signing/material/ce/22812149ed634416a8b68b7ce4509a2d
+          echo "$MATERIAL_FD_0" | base64 -d > signing/material/fd/0/10b5b2b3b6fe467b84d3917f1e0efea0
+          echo "$MATERIAL_FD_1" | base64 -d > signing/material/fd/1/df991c81d81f460fb07078e20dffe8df
+          echo "$MATERIAL_FD_2" | base64 -d > signing/material/fd/2/54ce7123b9be4be5b4847a0c86b730f1
+          chmod 600 signing/arkvault.p12
+
+      - name: Configure Signing
+        run: |
+          # 用 CI 模板替换密码占位符
+          sed 's/__P12_PASSWORD__/${{ secrets.P12_PASSWORD }}/g' build-profile.ci.json5 > build-profile.json5
+
+      - name: Install Dependencies
+        run: |
+          ohpm install
+
+      - name: Build HAP
+        run: |
+          hvigor assembleHap --mode module -p product=default
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: arkvault-hap
+          path: entry/build/default/outputs/default/*.hap
+          retention-days: 30
