@@ -25,3 +25,6 @@ Thumbs.db
 *.env
 *.p12
 *.pem
+signing/*.p12
+signing/*.cer
+signing/*.key
