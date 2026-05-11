@@ -1,8 +1,23 @@
 {
   "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "material": {
+          "storeFile": "signing/arkvault.p12",
+          "storePassword": "__P12_PASSWORD__",
+          "keyAlias": "arkvault",
+          "keyPassword": "__P12_PASSWORD__",
+          "profile": "signing/material/ac/c4137c7fe2674cfcba0c5a781afc18f1",
+          "certpath": "signing/arkvault.cer",
+          "signAlg": "SHA256withECDSA"
+        }
+      }
+    ],
     "products": [
       {
         "name": "default",
+        "signingConfig": "default",
         "compatibleSdkVersion": "5.0.1(13)",
         "runtimeOS": "HarmonyOS",
         "targetSdkVersion": "5.0.1(13)"
@@ -26,4 +41,3 @@
     }
   ]
 }
-
