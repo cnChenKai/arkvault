@@ -35,7 +35,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /opt/command-line-tools
-          key: harmonyos-cli-${{ env.COMMANDLINE_TOOLS_VERSION }}
+          key: harmonyos-cli-v2-${{ env.COMMANDLINE_TOOLS_VERSION }}
 
       - name: Download Command Line Tools
         if: steps.cache-cli.outputs.cache-hit != 'true'
@@ -81,10 +81,18 @@ jobs:
           echo "$MATERIAL_FD_1" | base64 -d > signing/material/fd/1/c27b707e147240a7815b56f637ee45da
           echo "$MATERIAL_FD_2" | base64 -d > signing/material/fd/2/3d32d61a49654a88bf619975f8f6e4d6
           chmod 600 signing/arkvault.p12
+          echo "=== Material file sizes ==="
+          for f in signing/material/fd/0/* signing/material/fd/1/* signing/material/fd/2/* signing/material/ac/* signing/material/ce/*; do
+            echo "$(wc -c < $f) $f"
+          done
+          echo "=== Material file checksums ==="
+          md5sum signing/material/fd/0/* signing/material/fd/1/* signing/material/fd/2/* signing/material/ac/* signing/material/ce/*
 
       - name: Configure Signing
         run: |
           sed 's/__P12_PASSWORD__/${{ secrets.P12_PASSWORD }}/g' build-profile.ci.json5 > build-profile.json5
+          echo "=== storePassword in build-profile ==="
+          grep storePassword build-profile.json5
 
       - name: Configure npm registry
         run: |
