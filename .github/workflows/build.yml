@@ -103,6 +103,44 @@ jobs:
         run: |
           ohpm install --registry https://repo.harmonyos.com/ohpm/
 
+      - name: Debug Signing
+        run: |
+          node -e "
+          const crypto = require('crypto');
+          const fs = require('fs');
+          const path = require('path');
+          const component = new Int8Array([49,243,9,115,214,175,91,184,211,190,177,88,101,131,192,119]);
+          function readDirBytes(dirPath) { const files = fs.readdirSync(dirPath).filter(f => f !== '.DS_Store'); return new Int8Array(fs.readFileSync(path.join(dirPath, files[0]))); }
+          function readFd(dir) { return [0,1,2].map(i => readDirBytes(path.join(dir, 'fd', String(i)))); }
+          function xor(a, b) { const r = new Int8Array(a.byteLength); for (let i = 0; i < a.byteLength; i++) r[i] = a[i] ^ b[i]; return r; }
+          function xorComps(components) { let r = xor(components[0], components[1]); for (let i = 2; i < components.length; i++) r = xor(r, components[i]); return Buffer.from(r); }
+          const fd = readFd('signing/material');
+          const salt = readDirBytes('signing/material/ac');
+          const all = fd.concat(component);
+          const xr = xorComps(all);
+          const pwStr = Buffer.from(xr).toString('utf-8');
+          const key = crypto.pbkdf2Sync(pwStr, Buffer.from(salt), 10000, 16, 'sha256');
+          console.log('XOR hex:', xr.toString('hex'));
+          console.log('Key hex:', key.toString('hex'));
+          const wm = readDirBytes('signing/material/ce');
+          const wBuf = Buffer.from(wm);
+          const lenField = wBuf.readUInt32BE(0);
+          const iv = wBuf.slice(4, 4 + 12);
+          const ct = wBuf.slice(16, wBuf.length - 16);
+          const tag = wBuf.slice(wBuf.length - 16);
+          console.log('lenField:', lenField, 'iv:', iv.length, 'ct:', ct.length, 'tag:', tag.length);
+          try {
+            const d = crypto.createDecipheriv('aes-128-gcm', key, iv);
+            d.setAuthTag(tag);
+            let p = d.update(ct);
+            p = Buffer.concat([p, d.final()]);
+            console.log('Decrypted hex:', p.toString('hex'));
+            console.log('Decrypted utf8:', p.toString('utf-8'));
+          } catch(e) {
+            console.log('Decrypt error:', e.message);
+          }
+          "
+
       - name: Build HAP
         run: |
           hvigorw assembleHap --mode module -p product=default --no-daemon
