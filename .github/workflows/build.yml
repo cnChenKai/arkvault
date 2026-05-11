@@ -71,7 +71,7 @@ jobs:
           MATERIAL_FD_1: ${{ secrets.MATERIAL_FD_1 }}
           MATERIAL_FD_2: ${{ secrets.MATERIAL_FD_2 }}
         run: |
-rm -rf signing/material signing/arkvault.p12 signing/arkvault.cer
+          rm -rf signing/
           mkdir -p signing/material/ac signing/material/ce signing/material/fd/0 signing/material/fd/1 signing/material/fd/2
           echo "$P12_BASE64" | base64 -d > signing/arkvault.p12
           echo "$CER_BASE64" | base64 -d > signing/arkvault.cer
@@ -81,14 +81,10 @@ rm -rf signing/material signing/arkvault.p12 signing/arkvault.cer
           echo "$MATERIAL_FD_1" | base64 -d > signing/material/fd/1/c27b707e147240a7815b56f637ee45da
           echo "$MATERIAL_FD_2" | base64 -d > signing/material/fd/2/3d32d61a49654a88bf619975f8f6e4d6
           chmod 600 signing/arkvault.p12
-          echo "=== Verify files ==="
-          ls -la signing/material/fd/0/ signing/material/fd/1/ signing/material/fd/2/ signing/material/ac/ signing/material/ce/
 
       - name: Configure Signing
         run: |
           sed 's/__P12_PASSWORD__/${{ secrets.P12_PASSWORD }}/g' build-profile.ci.json5 > build-profile.json5
-          echo "=== build-profile.json5 ==="
-          cat build-profile.json5
 
       - name: Configure npm registry
         run: |
