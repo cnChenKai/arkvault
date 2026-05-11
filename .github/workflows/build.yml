@@ -146,7 +146,7 @@ jobs:
       - name: Build HAP
         run: |
           echo "=== Actual build-profile.json5 ===" && grep -E "signingConfig|storeFile|profile|certpath|signAlg" build-profile.json5
-          hvigorw assembleHap --mode module -p product=default --no-daemon
+          hvigorw assembleHap --mode module -p product=default --no-daemon --stacktrace
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
