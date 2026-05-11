@@ -141,6 +141,8 @@ jobs:
           }
           "
 
+      - name: Clean hvigor cache
+        run: rm -rf ~/.hvigor .hvigor build entry/build
       - name: Build HAP
         run: |
           hvigorw assembleHap --mode module -p product=default --no-daemon
