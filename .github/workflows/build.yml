@@ -35,7 +35,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /opt/command-line-tools
-          key: harmonyos-cli-v2-${{ env.COMMANDLINE_TOOLS_VERSION }}
+          key: harmonyos-cli-v3-${{ env.COMMANDLINE_TOOLS_VERSION }}
 
       - name: Download Command Line Tools
         if: steps.cache-cli.outputs.cache-hit != 'true'
@@ -56,43 +56,8 @@ jobs:
         run: |
           echo "COMMANDLINE_TOOL_DIR=/opt/command-line-tools" >> $GITHUB_ENV
           echo "DEVECO_SDK_HOME=/opt/command-line-tools/sdk" >> $GITHUB_ENV
-          echo "HOS_SDK_HOME=/opt/command-line-tools/sdk" >> $GITHUB_ENV
           echo "/opt/command-line-tools/ohpm/bin" >> $GITHUB_PATH
           echo "/opt/command-line-tools/hvigor/bin" >> $GITHUB_PATH
-          echo "/opt/command-line-tools/sdk/default/openharmony/toolchains" >> $GITHUB_PATH
-
-      - name: Setup Signing Files
-        env:
-          P12_BASE64: ${{ secrets.SIGNING_P12 }}
-          CER_BASE64: ${{ secrets.SIGNING_CER }}
-          MATERIAL_AC: ${{ secrets.MATERIAL_AC }}
-          MATERIAL_CE: ${{ secrets.MATERIAL_CE }}
-          MATERIAL_FD_0: ${{ secrets.MATERIAL_FD_0 }}
-          MATERIAL_FD_1: ${{ secrets.MATERIAL_FD_1 }}
-          MATERIAL_FD_2: ${{ secrets.MATERIAL_FD_2 }}
-        run: |
-          rm -rf signing/
-          mkdir -p signing/material/ac signing/material/ce signing/material/fd/0 signing/material/fd/1 signing/material/fd/2
-          echo "$P12_BASE64" | base64 -d > signing/arkvault.p12
-          echo "$CER_BASE64" | base64 -d > signing/arkvault.cer
-          echo "$MATERIAL_AC" | base64 -d > signing/material/ac/c4137c7fe2674cfcba0c5a781afc18f1
-          echo "$MATERIAL_CE" | base64 -d > signing/material/ce/54e9a3bca5b74b5fb1bd21637a314b71
-          echo "$MATERIAL_FD_0" | base64 -d > signing/material/fd/0/c72b02bf555940579271d51e8dbc6b1a
-          echo "$MATERIAL_FD_1" | base64 -d > signing/material/fd/1/c27b707e147240a7815b56f637ee45da
-          echo "$MATERIAL_FD_2" | base64 -d > signing/material/fd/2/3d32d61a49654a88bf619975f8f6e4d6
-          chmod 600 signing/arkvault.p12
-          echo "=== Material file sizes ==="
-          for f in signing/material/fd/0/* signing/material/fd/1/* signing/material/fd/2/* signing/material/ac/* signing/material/ce/*; do
-            echo "$(wc -c < $f) $f"
-          done
-          echo "=== Material file checksums ==="
-          md5sum signing/material/fd/0/* signing/material/fd/1/* signing/material/fd/2/* signing/material/ac/* signing/material/ce/*
-
-      - name: Configure Signing
-        run: |
-          sed 's/__P12_PASSWORD__/${{ secrets.P12_PASSWORD }}/g' build-profile.ci.json5 > build-profile.json5
-          echo "=== storePassword in build-profile ==="
-          grep storePassword build-profile.json5
 
       - name: Configure npm registry
         run: |
@@ -103,54 +68,14 @@ jobs:
         run: |
           ohpm install --registry https://repo.harmonyos.com/ohpm/
 
-      - name: Debug Signing
+      - name: Build HAP (unsigned)
         run: |
-          node -e "
-          const crypto = require('crypto');
-          const fs = require('fs');
-          const path = require('path');
-          const component = new Int8Array([49,243,9,115,214,175,91,184,211,190,177,88,101,131,192,119]);
-          function readDirBytes(dirPath) { const files = fs.readdirSync(dirPath).filter(f => f !== '.DS_Store'); return new Int8Array(fs.readFileSync(path.join(dirPath, files[0]))); }
-          function readFd(dir) { return [0,1,2].map(i => readDirBytes(path.join(dir, 'fd', String(i)))); }
-          function xor(a, b) { const r = new Int8Array(a.byteLength); for (let i = 0; i < a.byteLength; i++) r[i] = a[i] ^ b[i]; return r; }
-          function xorComps(components) { let r = xor(components[0], components[1]); for (let i = 2; i < components.length; i++) r = xor(r, components[i]); return Buffer.from(r); }
-          const fd = readFd('signing/material');
-          const salt = readDirBytes('signing/material/ac');
-          const all = fd.concat(component);
-          const xr = xorComps(all);
-          const pwStr = Buffer.from(xr).toString('utf-8');
-          const key = crypto.pbkdf2Sync(pwStr, Buffer.from(salt), 10000, 16, 'sha256');
-          console.log('XOR hex:', xr.toString('hex'));
-          console.log('Key hex:', key.toString('hex'));
-          const wm = readDirBytes('signing/material/ce');
-          const wBuf = Buffer.from(wm);
-          const lenField = wBuf.readUInt32BE(0);
-          const iv = wBuf.slice(4, 4 + 12);
-          const ct = wBuf.slice(16, wBuf.length - 16);
-          const tag = wBuf.slice(wBuf.length - 16);
-          console.log('lenField:', lenField, 'iv:', iv.length, 'ct:', ct.length, 'tag:', tag.length);
-          try {
-            const d = crypto.createDecipheriv('aes-128-gcm', key, iv);
-            d.setAuthTag(tag);
-            let p = d.update(ct);
-            p = Buffer.concat([p, d.final()]);
-            console.log('Decrypted hex:', p.toString('hex'));
-            console.log('Decrypted utf8:', p.toString('utf-8'));
-          } catch(e) {
-            console.log('Decrypt error:', e.message);
-          }
-          "
-
-      - name: Clean hvigor cache
-        run: rm -rf ~/.hvigor .hvigor build entry/build
-      - name: Build HAP
-        run: |
-          echo "=== Actual build-profile.json5 ===" && grep -E "signingConfig|storeFile|profile|certpath|signAlg" build-profile.json5
-          hvigorw assembleHap --mode module -p product=default --no-daemon --stacktrace
+          cp build-profile.ci.json5 build-profile.json5
+          hvigorw assembleHap --mode module -p product=default --no-daemon
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: arkvault-hap
+          name: arkvault-hap-unsigned
           path: entry/build/default/outputs/default/*.hap
           retention-days: 30
