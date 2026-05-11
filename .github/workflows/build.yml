@@ -145,6 +145,7 @@ jobs:
         run: rm -rf ~/.hvigor .hvigor build entry/build
       - name: Build HAP
         run: |
+          echo "=== Actual build-profile.json5 ===" && grep -E "signingConfig|storeFile|profile|certpath|signAlg" build-profile.json5
           hvigorw assembleHap --mode module -p product=default --no-daemon
 
       - name: Upload Build Artifact
