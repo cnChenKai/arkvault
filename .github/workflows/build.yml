@@ -95,6 +95,11 @@ jobs:
           ohpm install --registry https://repo.harmonyos.com/ohpm/
 
       - name: Build HAP
+        env:
+          SIGNING_STOREPASSWORD: ${{ secrets.SIGNING_STOREPASSWORD }}
+          SIGNING_KEYPASSWORD: ${{ secrets.SIGNING_KEYPASSWORD }}
+          SIGNING_KEYALIAS: ${{ secrets.SIGNING_KEYALIAS }}
+          SIGNING_MATERIAL: ${{ secrets.SIGNING_MATERIAL }}
         run: |
           hvigorw assembleHap --mode module -p product=default --no-daemon
 
