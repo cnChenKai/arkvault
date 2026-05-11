@@ -72,18 +72,18 @@ jobs:
           MATERIAL_FD_2: ${{ secrets.MATERIAL_FD_2 }}
         run: |
           mkdir -p signing/material/ac signing/material/ce signing/material/fd/0 signing/material/fd/1 signing/material/fd/2
-           base64 -d > signing/arkvault.p12| base64 -d > signing/arkvault.p12
-           base64 -d > signing/arkvault.cer| base64 -d > signing/arkvault.cer
-          # signing skipped
-          # signing skipped
-          # signing skipped
-          # signing skipped
-          # signing skipped
-          # signing skipped
+          echo "$P12_BASE64" | base64 -d > signing/arkvault.p12
+          echo "$CER_BASE64" | base64 -d > signing/arkvault.cer
+          echo "$MATERIAL_AC" | base64 -d > signing/material/ac/c4137c7fe2674cfcba0c5a781afc18f1
+          echo "$MATERIAL_CE" | base64 -d > signing/material/ce/54e9a3bca5b74b5fb1bd21637a314b71
+          echo "$MATERIAL_FD_0" | base64 -d > signing/material/fd/0/c72b02bf555940579271d51e8dbc6b1a
+          echo "$MATERIAL_FD_1" | base64 -d > signing/material/fd/1/c27b707e147240a7815b56f637ee45da
+          echo "$MATERIAL_FD_2" | base64 -d > signing/material/fd/2/3d32d61a49654a88bf619975f8f6e4d6
+          chmod 600 signing/arkvault.p12
 
       - name: Configure Signing
         run: |
-          cp build-profile.ci.json5 build-profile.json5
+          sed 's/__P12_PASSWORD__/${{ secrets.P12_PASSWORD }}/g' build-profile.ci.json5 > build-profile.json5
 
       - name: Configure npm registry
         run: |
