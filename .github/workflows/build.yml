@@ -71,7 +71,7 @@ jobs:
           MATERIAL_FD_1: ${{ secrets.MATERIAL_FD_1 }}
           MATERIAL_FD_2: ${{ secrets.MATERIAL_FD_2 }}
         run: |
-rm -rf signing/
+rm -rf signing/material signing/arkvault.p12 signing/arkvault.cer
           mkdir -p signing/material/ac signing/material/ce signing/material/fd/0 signing/material/fd/1 signing/material/fd/2
           echo "$P12_BASE64" | base64 -d > signing/arkvault.p12
           echo "$CER_BASE64" | base64 -d > signing/arkvault.cer
