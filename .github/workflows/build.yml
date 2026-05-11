@@ -14,6 +14,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -35,7 +36,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /opt/command-line-tools
-          key: harmonyos-cli-v3-${{ env.COMMANDLINE_TOOLS_VERSION }}
+          key: harmonyos-cli-v4-${{ env.COMMANDLINE_TOOLS_VERSION }}
 
       - name: Download Command Line Tools
         if: steps.cache-cli.outputs.cache-hit != 'true'
@@ -73,9 +74,49 @@ jobs:
           cp build-profile.ci.json5 build-profile.json5
           hvigorw assembleHap --mode module -p product=default --no-daemon
 
-      - name: Upload Build Artifact
+      - name: Sign HAP
+        if: ${{ secrets.SIGNING_CER != '' && secrets.SIGNING_PROFILE != '' }}
+        env:
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          SIGNING_CER: ${{ secrets.SIGNING_CER }}
+          SIGNING_PROFILE: ${{ secrets.SIGNING_PROFILE }}
+        run: |
+          # 解码签名文件
+          echo "$SIGNING_CER" | base64 -d > signing.cer
+          echo "$SIGNING_PROFILE" | base64 -d > signing.p7b
+          echo "$SIGNING_P12" | base64 -d > signing.p12
+
+          # 找到 unsigned HAP
+          UNSIGNED_HAP=$(find entry/build -name "*unsigned*.hap" | head -1)
+          SIGNED_HAP="${UNSIGNED_HAP/unsigned/signed}"
+
+          echo "Signing: $UNSIGNED_HAP -> $SIGNED_HAP"
+
+          # 用 hap-sign-tool 签名
+          java -jar /opt/command-line-tools/sdk/default/openharmony/toolchains/lib/hap-sign-tool.jar sign-app \
+            -keyAlias arkvault \
+            -appCertFile signing.cer \
+            -profileFile signing.p7b \
+            -inFile "$UNSIGNED_HAP" \
+            -keystoreFile signing.p12 \
+            -outFile "$SIGNED_HAP" \
+            -keyPwd "$P12_PASSWORD" \
+            -keystorePwd "$P12_PASSWORD" \
+            -signAlg SHA256withECDSA
+
+          echo "Signed HAP: $SIGNED_HAP"
+
+      - name: Upload Unsigned HAP
         uses: actions/upload-artifact@v4
         with:
           name: arkvault-hap-unsigned
-          path: entry/build/default/outputs/default/*.hap
+          path: entry/build/default/outputs/default/*unsigned*.hap
+          retention-days: 30
+
+      - name: Upload Signed HAP
+        if: ${{ hashFiles('entry/build/default/outputs/default/*signed*.hap') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: arkvault-hap-signed
+          path: entry/build/default/outputs/default/*signed*.hap
           retention-days: 30
