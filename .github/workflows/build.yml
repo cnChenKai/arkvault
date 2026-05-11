@@ -80,10 +80,14 @@ jobs:
           echo "$MATERIAL_FD_1" | base64 -d > signing/material/fd/1/c27b707e147240a7815b56f637ee45da
           echo "$MATERIAL_FD_2" | base64 -d > signing/material/fd/2/3d32d61a49654a88bf619975f8f6e4d6
           chmod 600 signing/arkvault.p12
+          echo "=== Verify files ==="
+          ls -la signing/material/fd/0/ signing/material/fd/1/ signing/material/fd/2/ signing/material/ac/ signing/material/ce/
 
       - name: Configure Signing
         run: |
           sed 's/__P12_PASSWORD__/${{ secrets.P12_PASSWORD }}/g' build-profile.ci.json5 > build-profile.json5
+          echo "=== build-profile.json5 ==="
+          cat build-profile.json5
 
       - name: Configure npm registry
         run: |
@@ -95,11 +99,6 @@ jobs:
           ohpm install --registry https://repo.harmonyos.com/ohpm/
 
       - name: Build HAP
-        env:
-          SIGNING_STOREPASSWORD: ${{ secrets.SIGNING_STOREPASSWORD }}
-          SIGNING_KEYPASSWORD: ${{ secrets.SIGNING_KEYPASSWORD }}
-          SIGNING_KEYALIAS: ${{ secrets.SIGNING_KEYALIAS }}
-          SIGNING_MATERIAL: ${{ secrets.SIGNING_MATERIAL }}
         run: |
           hvigorw assembleHap --mode module -p product=default --no-daemon
 
